@@ -9,6 +9,8 @@ class UserCreateView(CreateAPIView):
     model = User
     serializer_class = UserSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 class UserProfile(RetrieveAPIView):
     model = User

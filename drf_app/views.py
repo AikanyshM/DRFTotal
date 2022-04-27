@@ -16,6 +16,9 @@ class InventoryListView(ListCreateAPIView):
     authentication_classes = [authentication.TokenAuthentication, ]
     permission_classes = [BasicPermission, ]
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
     def check_seller(self, request, name, cost, seller, category):
         if request.user == User.seller:
             new_inventory = Inventory.objects.create(name=name, cost=cost, seller=seller, category=category)
@@ -30,10 +33,11 @@ class InventoryUpdateView(RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
 
 class CategoryListView(ListCreateAPIView):
-    categories = Category.objects.all()
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
     authentication_classes = [authentication.TokenAuthentication, ]
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
+    permission_classes = [permissions.IsAdminUser ]
+
 
     def check_buyer(self, request):
         if request.user == User.buyer:
@@ -49,8 +53,8 @@ class CategoryListView(ListCreateAPIView):
 
 
 class CategoryUpdateView(RetrieveUpdateDestroyAPIView):
-    categories = Category.objects.all()
-    serializer_class = CategorySerializer(categories, many=True)
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
     authentication_classes = [authentication.TokenAuthentication, ]
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
 
